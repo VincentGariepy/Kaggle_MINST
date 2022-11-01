@@ -3,6 +3,7 @@ import numpy as np
 
 class LogisiticRegression:
     def __init__(self, trainData, trainLabels):
+        #Sauver les données et calculer les variables importantes
         self.trainData = trainData
         self.trainLabels = trainLabels
         self.featureSize = len(trainData.columns)
@@ -16,6 +17,7 @@ class LogisiticRegression:
         loss = None
 
     def softmax(self,x):
+        #Fonction de softmax, peut prendre une matrice en entrée, retourne un numpy array de la meme forme que l'entrée
         x = x.transpose()
         e_x = np.exp(x - np.max(x,axis=0))
         return (e_x / e_x.sum(axis=0)).transpose()
@@ -29,10 +31,12 @@ class LogisiticRegression:
         return df
 
     def plotLoss(self):
+        #Pour faire un graphique du loss pour analyser
         return self.loss.plot(xlabel='itération',ylabel='Coût (entropie croisé)',kind='line',
                                 title="Perte d'entrainement en fonction du nombre d'itération")
     
     def predictSoftmax(self, df):
+        #Fonction qui donne les probabilités de prediction de la matrice d'entrée
         #Calculer le le produit de W^T*X^T+b pour tous les echantillons
         newW = self.weights.transpose()
         newX = df.transpose()
@@ -45,6 +49,7 @@ class LogisiticRegression:
         return softMaxResult
 
     def predict(self, df):
+        #Fonction qui donne les predictions de la matrice d'entrée
         #Calculer le le produit de W^T*X^T+b pour tous les echantillons
         newW = self.weights.transpose()
         newX = df.transpose()
@@ -70,15 +75,18 @@ class LogisiticRegression:
         return (X.dot((Y-Yhat.transpose()).transpose().to_numpy()))/bathSize
     
     def accuracy(self,X,Y):
+        #Calcul la précision des prédictions
         predictions = self.predict(X)
         return (np.sum(predictions==Y))/len(Y)
 
 
     def train(self, iter, batchSize, alpha):
+        #Pour enregistrer l'évolution de la perte
         loss = pd.Series(np.zeros(iter))
 
+        #itérer par le nombre de itéreation entrée
         for i in range(iter):
-            #Creer aleatoire la batch 
+            #Sample aléatoirement un ensemble de données de la grandeur de batch size 
             sampleTrain = self.trainData.sample(batchSize,replace=False,axis=0)
             sampleLabels = self.trainLabels.iloc[sampleTrain.index]
             yOneHot = self.oneHotEncoder(sampleLabels)
